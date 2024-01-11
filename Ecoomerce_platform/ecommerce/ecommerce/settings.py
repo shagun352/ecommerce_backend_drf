@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'product',
+    'cart',
 ]
 
 MIDDLEWARE = [
@@ -79,7 +80,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'ecommerce.wsgi.application'
-AUTH_USER_MODEL = 'users.User' 
+AUTH_USER_MODEL = 'users.User'
 
 
 # Database
