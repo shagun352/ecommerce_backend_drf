@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils.text import slugify
+
 
 # Create your models here.
 
@@ -8,7 +8,7 @@ class Category(models.Model):
     slug = models.SlugField(max_length=40)
 
     def __str__(self) -> str:
-        return self.c_name
+        return str(self.c_name)
 
 
     # def save(self, **kwargs):
@@ -26,4 +26,4 @@ class Product(models.Model):
     image = models.ImageField(upload_to='images/')
 
     def __str__(self):
-        return self.name
+        return str(self.name)

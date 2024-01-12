@@ -3,28 +3,42 @@ from rest_framework import serializers
 from product.models import Product
 from .models import CartItem, Cart
 
-class CartItemSerializer(serializers.ModelSerializer):
-    """the items added in the cart"""
-    product_id = serializers.PrimaryKeyRelatedField(
-        queryset=Product.objects.all(), required=True, write_only=True, source='product')
-    product_name = serializers.CharField(source='product.name', read_only=True)
-    class Meta:
-        """ class meta """
-        model = CartItem
-        fields = ['product_id', 'quantity','product_name']
-
 
 class CartSerializer(serializers.ModelSerializer):
-    """ cart related to the user serializer """
-    items = CartItemSerializer(many=True)
-    total_price = serializers.SerializerMethodField()
+    """cart serializer"""
+    class Meta:
+        """ class meta"""
+        model = Cart
+        fields = '__all__'
+
+
+class CartItemSerializer(serializers.ModelSerializer):
+    """cart item serializer"""
+    product_id = serializers.IntegerField(write_only=True, required=True)
 
     class Meta:
-        """ class meta """
-        model = Cart
-        fields = ['id', 'user', 'total_price', 'items']
+        """class meta"""
+        model = CartItem
+        fields = ['product_id', 'quantity']
 
-    def get_total_price(self, obj):
-        """to calculate toatl price """
-        return sum(item.calculate_total_cost() for item in obj.items.all())
+    def validate_product_id(self, value):
+        """
+        Check that the product_id corresponds to a valid Product.
+        """
+        try:
+            Product.objects.get(id=value)
+        except Product.DoesNotExist:
+            raise serializers.ValidationError("Product not found.")
+        return value
 
+    def create(self, validated_data):
+        product = Product.objects.get(id=validated_data['product_id'])
+        print("the product crete =",product)
+        cart_item = CartItem.objects.create(
+            product=product,
+            cart=validated_data['cart'],
+            quantity=validated_data.get('quantity', 1)  # Default to 1 if not specified
+        )
+        print("validated_dta",validated_data)
+        print("cart item",cart_item)
+        return cart_item
